@@ -1,17 +1,4 @@
 # --- Install & Import packages ---
-import sys
-import subprocess
-
-def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-
-required_packages = ['pandas', 'numpy', 'plotly', 'streamlit', 'openpyxl']
-for package in required_packages:
-    try:
-        __import__(package)
-    except ImportError:
-        install(package)
-
 import pandas as pd
 import numpy as np
 import plotly.express as px
@@ -57,17 +44,21 @@ def load_clean(file_path, value_name):
     return df_long
 
 # --- Load All Data ---
-reserve = load_clean('data/reserve.xlsx', 'Reserve')
-production = load_clean('data/production.xlsx', 'Production')
-import_ = load_clean('data/import.xlsx', 'Import')
-export = load_clean('data/export.xlsx', 'Export')
-demand = load_clean('data/demand.xlsx', 'Demand')
+try:
+    reserve = load_clean('data/reserve.xlsx', 'Reserve')
+    production = load_clean('data/production.xlsx', 'Production')
+    import_ = load_clean('data/import.xlsx', 'Import')
+    export = load_clean('data/export.xlsx', 'Export')
+    demand = load_clean('data/demand.xlsx', 'Demand')
 
-# Merge all datasets
-final_df = reserve.merge(production, on=['Country', 'Year'], how='outer') \
-                  .merge(import_, on=['Country', 'Year'], how='outer') \
-                  .merge(export, on=['Country', 'Year'], how='outer') \
-                  .merge(demand, on=['Country', 'Year'], how='outer')
+    # Merge all datasets
+    final_df = reserve.merge(production, on=['Country', 'Year'], how='outer') \
+                      .merge(import_, on=['Country', 'Year'], how='outer') \
+                      .merge(export, on=['Country', 'Year'], how='outer') \
+                      .merge(demand, on=['Country', 'Year'], how='outer')
+except Exception as e:
+    st.error(f"❌ Error loading data: {e}")
+    st.stop()
 
 # --- Sidebar Navigation ---
 st.sidebar.title("📌 Navigation")
@@ -128,13 +119,7 @@ elif section == "2. Global Indicator Map":
         locationmode="country names",
         color=indicator,
         hover_name="Country",
-        hover_data={
-            'Reserve': ':.0f',
-            'Production': ':.0f',
-            'Import': ':.0f',
-            'Export': ':.0f',
-            'Demand': ':.0f'
-        },
+        hover_data={col: ':.0f' for col in indicator_options.keys()},
         color_continuous_scale=color_palette,
         labels={indicator: indicator_options[indicator]},
     )
@@ -154,11 +139,11 @@ elif section == "3. Country Time Series Analysis":
     st.title("📈 Country-Level Time Series Analysis")
 
     indicator_options = {
-    'Reserve': 'Reserve (million barrels)',
-    'Production': 'Production (million barrels)',
-    'Import': 'Import (million barrels)',
-    'Export': 'Export (million barrels)',
-    'Demand': 'Demand (million barrels)'
+        'Reserve': 'Reserve (million barrels)',
+        'Production': 'Production (million barrels)',
+        'Import': 'Import (million barrels)',
+        'Export': 'Export (million barrels)',
+        'Demand': 'Demand (million barrels)'
     }
 
     selected_country = st.selectbox('Select a Country:', sorted(final_df['Country'].dropna().unique()))
@@ -188,11 +173,11 @@ elif section == "4. Top 10 Countries by Selected Indicator":
     """)
 
     indicator_options = {
-    'Reserve': 'Reserve (million barrels)',
-    'Production': 'Production (million barrels)',
-    'Import': 'Import (million barrels)',
-    'Export': 'Export (million barrels)',
-    'Demand': 'Demand (million barrels)'
+        'Reserve': 'Reserve (million barrels)',
+        'Production': 'Production (million barrels)',
+        'Import': 'Import (million barrels)',
+        'Export': 'Export (million barrels)',
+        'Demand': 'Demand (million barrels)'
     }
 
     indicator = st.selectbox('Select Indicator:', list(indicator_options.keys()), index=0, key="indicator_3")
@@ -228,11 +213,11 @@ elif section == "5. Indicator Distribution Across Countries":
     """)
 
     indicator_options = {
-    'Reserve': 'Reserve (million barrels)',
-    'Production': 'Production (million barrels)',
-    'Import': 'Import (million barrels)',
-    'Export': 'Export (million barrels)',
-    'Demand': 'Demand (million barrels)'
+        'Reserve': 'Reserve (million barrels)',
+        'Production': 'Production (million barrels)',
+        'Import': 'Import (million barrels)',
+        'Export': 'Export (million barrels)',
+        'Demand': 'Demand (million barrels)'
     }
 
     indicator = st.selectbox('Select Indicator:', list(indicator_options.keys()), index=0, key="indicator_4")
