@@ -153,6 +153,14 @@ elif section == "2. Global Indicator Map":
 elif section == "3. Country Time Series Analysis":
     st.title("📈 Country-Level Time Series Analysis")
 
+    indicator_options = {
+    'Reserve': 'Reserve (million barrels)',
+    'Production': 'Production (million barrels)',
+    'Import': 'Import (million barrels)',
+    'Export': 'Export (million barrels)',
+    'Demand': 'Demand (million barrels)'
+    }
+
     selected_country = st.selectbox('Select a Country:', sorted(final_df['Country'].dropna().unique()))
     indicator = st.selectbox('Select Indicator:', list(indicator_options.keys()), index=0, key="indicator_2")
 
@@ -178,6 +186,14 @@ elif section == "4. Top 10 Countries by Selected Indicator":
     **Why it matters:**  
     Quickly identify major players in reserves, production, imports, exports, or demand.
     """)
+
+    indicator_options = {
+    'Reserve': 'Reserve (million barrels)',
+    'Production': 'Production (million barrels)',
+    'Import': 'Import (million barrels)',
+    'Export': 'Export (million barrels)',
+    'Demand': 'Demand (million barrels)'
+    }
 
     indicator = st.selectbox('Select Indicator:', list(indicator_options.keys()), index=0, key="indicator_3")
     year = st.slider('Select Year:', 1960, 2023, 2012, step=1, key="year_2")
@@ -210,6 +226,14 @@ elif section == "5. Indicator Distribution Across Countries":
     **Why it matters:**  
     Understand global patterns, detect outliers, and explore how resources are distributed.
     """)
+
+    indicator_options = {
+    'Reserve': 'Reserve (million barrels)',
+    'Production': 'Production (million barrels)',
+    'Import': 'Import (million barrels)',
+    'Export': 'Export (million barrels)',
+    'Demand': 'Demand (million barrels)'
+    }
 
     indicator = st.selectbox('Select Indicator:', list(indicator_options.keys()), index=0, key="indicator_4")
     year = st.slider('Select Year:', 1960, 2023, 2012, step=1, key="year_3")
