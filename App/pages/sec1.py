@@ -3,17 +3,22 @@ import plotly.express as px
 
 def render_sec1(final_df):
     """
-    Render the World Map Distribution page using Streamlit.
-    Allows users to select oil indicators, years, and color palettes.
+    Render World Map Distribution with indicator selection and year slider.
     """
 
-    # Page title
-    st.title("🗺️ World Map Distribution")
+    # --- Page Header ---
+    st.markdown(
+        """
+        <h1 style="text-align: center;">🌍 Global Oil Indicators Map</h1>
+        <p style="text-align: center;">Explore reserves, production, imports, exports, and demand across countries from 1960 to 2023.</p>
+        """,
+        unsafe_allow_html=True
+    )
 
     # --- Sidebar controls ---
     st.sidebar.header("Map Settings")
 
-    # Available indicators
+    # Options
     indicator_options = {
         'Reserve': 'Reserve (million barrels)',
         'Production': 'Production (million barrels)',
@@ -22,23 +27,19 @@ def render_sec1(final_df):
         'Demand': 'Demand (million barrels)'
     }
 
-    # Available color palettes
     color_palettes = [
         'Viridis', 'Turbo', 'Cividis', 'Blues', 'Greens', 'Reds', 'Purples', 'Plasma',
         'Inferno', 'Magma', 'IceFire', 'RdYlGn', 'Spectral', 'RdBu', 'PuBuGn'
     ]
 
-    # User selections
-    selected_indicator = st.sidebar.selectbox("Select Indicator:", list(indicator_options.keys()), index=0)
-    selected_year = st.sidebar.slider("Select Year:", min_value=1960, max_value=2023, value=2012, step=1)
+    # Sidebar selections
+    selected_indicator = st.sidebar.radio("Select Indicator:", list(indicator_options.keys()), index=0)
+    selected_year = st.sidebar.slider("Select Year:", 1960, 2023, 2012)
     selected_palette = st.sidebar.selectbox("Select Color Palette:", color_palettes, index=1)
 
-    # --- Main area: Map ---
-
-    # Filter data
+    # --- Main Map ---
     filtered = final_df[final_df['Year'] == selected_year]
 
-    # Create choropleth map
     fig = px.choropleth(
         filtered,
         locations="Country",
@@ -64,17 +65,19 @@ def render_sec1(final_df):
             showcoastlines=True,
             landcolor="lightgray"
         ),
-        margin=dict(l=0, r=0, t=20, b=0)
+        margin=dict(l=0, r=0, t=30, b=0)
     )
 
     # Display the map
     st.plotly_chart(fig, use_container_width=True)
 
     # --- Footer instructions ---
-    st.markdown("""
-    ---
-    **Instructions:**  
-    - Use the sidebar to select different oil indicators, years, and color palettes.  
-    - Hover over countries on the map to view detailed data.  
-    - Adjust the color palette to highlight different ranges more clearly.
-    """)
+    st.markdown(
+        """
+        ---
+        **How to use:**  
+        - Use the sidebar to select an oil indicator and year.
+        - Hover over countries to see detailed data.
+        - Change color palette to visualize differently.
+        """
+    )
