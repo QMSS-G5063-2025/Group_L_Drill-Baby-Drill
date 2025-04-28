@@ -23,7 +23,7 @@ st.set_page_config(page_title="Global Oil Indicators Dashboard", page_icon="🌎
 
 # --- Hero Banner ---
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-IMAGE_PATH = os.path.join(CURRENT_DIR, "image", "oil_banner.jpg")  # <-- 請準備一張油田或能源相關的圖
+IMAGE_PATH = os.path.join(CURRENT_DIR, "image", "oil_banner.jpg")  # <-- 自己準備油田圖片放這
 if os.path.exists(IMAGE_PATH):
     st.image(IMAGE_PATH, use_container_width=True)
 
@@ -43,9 +43,14 @@ def load_clean(file_path, value_name):
     df = df[[country_col] + year_columns]
     df = df.rename(columns={country_col: 'Country'})
     df = df.dropna(subset=['Country'])
-    regions_to_exclude = ['OECD Americas', 'OECD Europe', 'OECD Asia Oceania', 'OECD', 'Non-OECD Europe and Eurasia', 'Non-OECD', 'Africa', 'Middle East', 'Asia Pacific', 'World']
+    regions_to_exclude = ['OECD Americas', 'OECD Europe', 'OECD Asia Oceania', 'OECD',
+                          'Non-OECD Europe and Eurasia', 'Non-OECD', 'Africa', 'Middle East',
+                          'Asia Pacific', 'World']
     df = df[~df['Country'].isin(regions_to_exclude)]
-    replace_dict = {'United States': 'United States of America', 'Venezuela2': 'Venezuela', 'Iran, Islamic Republic of3': 'Iran', 'Syria4': 'Syria', 'Libya5': 'Libya', 'Vietnam6': 'Vietnam', 'Brunei Darussalam7': 'Brunei', 'Sudan & South Sudan8': 'Sudan', 'Congo': 'Republic of the Congo'}
+    replace_dict = {'United States': 'United States of America', 'Venezuela2': 'Venezuela',
+                    'Iran, Islamic Republic of3': 'Iran', 'Syria4': 'Syria', 'Libya5': 'Libya',
+                    'Vietnam6': 'Vietnam', 'Brunei Darussalam7': 'Brunei', 'Sudan & South Sudan8': 'Sudan',
+                    'Congo': 'Republic of the Congo'}
     df['Country'] = df['Country'].replace(replace_dict)
     df_long = df.melt(id_vars='Country', value_vars=year_columns, var_name='Year', value_name=value_name)
     df_long[value_name] = pd.to_numeric(df_long[value_name], errors='coerce').fillna(0)
@@ -71,7 +76,9 @@ section = st.sidebar.radio(
     [
         "1. Project Overview",
         "2. Global Indicator Map",
-        "3. Country Time Series Analysis"
+        "3. Country Time Series Analysis",
+        "4. Top 10 Countries by Selected Indicator",
+        "5. Indicator Distribution Across Countries"
     ]
 )
 
@@ -97,7 +104,6 @@ if section == "1. Project Overview":
 elif section == "2. Global Indicator Map":
     st.title("🗺️ Global Oil Indicator Map (1960-2023)")
 
-    # Controls
     indicator_options = {
         'Reserve': 'Reserve (million barrels)',
         'Production': 'Production (million barrels)',
@@ -115,7 +121,6 @@ elif section == "2. Global Indicator Map":
 
     year = st.slider('Select Year:', 1960, 2023, 2012, step=1)
 
-    # Map
     filtered = final_df[final_df['Year'] == year]
     fig_map = px.choropleth(
         filtered,
@@ -149,13 +154,6 @@ elif section == "3. Country Time Series Analysis":
     st.title("📈 Country-Level Time Series Analysis")
 
     selected_country = st.selectbox('Select a Country:', sorted(final_df['Country'].dropna().unique()))
-    indicator_options = {
-        'Reserve': 'Reserve (million barrels)',
-        'Production': 'Production (million barrels)',
-        'Import': 'Import (million barrels)',
-        'Export': 'Export (million barrels)',
-        'Demand': 'Demand (million barrels)'
-    }
     indicator = st.selectbox('Select Indicator:', list(indicator_options.keys()), index=0, key="indicator_2")
 
     country_data = final_df[final_df['Country'] == selected_country]
@@ -170,6 +168,67 @@ elif section == "3. Country Time Series Analysis":
     fig_line.update_layout(margin=dict(l=20, r=20, t=20, b=20))
     st.plotly_chart(fig_line, use_container_width=True)
 
-# --- End ---
+# --- Section 4: Top 10 Countries by Selected Indicator ---
+elif section == "4. Top 10 Countries by Selected Indicator":
+    st.title("🏆 Top 10 Countries by Selected Indicator")
 
+    st.markdown("""
+    This section ranks the top 10 countries based on the selected oil-related indicator.
+    
+    **Why it matters:**  
+    Quickly identify major players in reserves, production, imports, exports, or demand.
+    """)
+
+    indicator = st.selectbox('Select Indicator:', list(indicator_options.keys()), index=0, key="indicator_3")
+    year = st.slider('Select Year:', 1960, 2023, 2012, step=1, key="year_2")
+
+    top10 = final_df[final_df['Year'] == year].sort_values(by=indicator, ascending=False).head(10)
+
+    fig_top10 = px.bar(
+        top10,
+        x=indicator,
+        y='Country',
+        orientation='h',
+        color='Country',
+        title=f"Top 10 Countries by {indicator_options[indicator]} ({year})",
+        labels={indicator: indicator_options[indicator]},
+    )
+    fig_top10.update_layout(
+        yaxis=dict(autorange="reversed"),
+        template='simple_white',
+        margin=dict(l=20, r=20, t=40, b=20)
+    )
+    st.plotly_chart(fig_top10, use_container_width=True)
+
+# --- Section 5: Indicator Distribution Across Countries ---
+elif section == "5. Indicator Distribution Across Countries":
+    st.title("📊 Indicator Distribution Across Countries")
+
+    st.markdown("""
+    This section shows the distribution of a selected oil-related indicator across all countries.
+    
+    **Why it matters:**  
+    Understand global patterns, detect outliers, and explore how resources are distributed.
+    """)
+
+    indicator = st.selectbox('Select Indicator:', list(indicator_options.keys()), index=0, key="indicator_4")
+    year = st.slider('Select Year:', 1960, 2023, 2012, step=1, key="year_3")
+
+    distribution = final_df[final_df['Year'] == year][indicator]
+
+    fig_dist = px.histogram(
+        distribution,
+        nbins=30,
+        title=f"Distribution of {indicator_options[indicator]} ({year})",
+        labels={indicator: indicator_options[indicator]},
+    )
+    fig_dist.update_layout(
+        template='simple_white',
+        margin=dict(l=20, r=20, t=40, b=20),
+        xaxis_title=indicator_options[indicator],
+        yaxis_title="Number of Countries"
+    )
+    st.plotly_chart(fig_dist, use_container_width=True)
+
+# --- Footer ---
 st.caption("Global Oil Indicators Dashboard · Powered by Streamlit · 2025")
