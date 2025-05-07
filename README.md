@@ -44,7 +44,7 @@ This dashboard integrates several datasets to offer a engaging and informative v
 
 ## 🧑‍💻 Getting Started
 
-### 1. Clone the Repository
+###  Step 1: Clone the Repository
 
 
 git clone https://github.com/your-username/fossil-fuel-dashboard.git
