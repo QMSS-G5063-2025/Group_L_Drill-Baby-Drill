@@ -1,0 +1,12 @@
+name: DrillBabyDrill
+title: DrillBabyDrill
+username: drillbabydrill-datavisualization
+account: drillbabydrill-datavisualization
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 14651637
+bundleId: 10242198
+url: https://drillbabydrill-datavisualization.shinyapps.io/DrillBabyDrill/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
