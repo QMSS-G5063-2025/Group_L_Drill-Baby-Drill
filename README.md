@@ -4,7 +4,6 @@ This interactive **Shiny dashboard** explores global fossil fuel production, con
 
 https://drillbabydrill-datavisualization.shinyapps.io/DrillBabyDrill/
 
-![Dashboard Screenshot](screenshots/dashboar_cover.png) <!-- Replace with your actual image path -->
 
 ---
 
